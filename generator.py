@@ -1,94 +1,114 @@
-
 from datetime import date
-import random
+import json
+import streamlit as st
+from openai import OpenAI
 
-SYMBOL_MEANINGS = {
-    "Tree of Life": "growth, grounding, ancestry, and connection between earth and spirit",
-    "Flower of Life": "unity, creation, harmony, and the interconnected pattern of life",
-    "Seed of Life": "new beginnings, potential, creation, and sacred order",
-    "Metatron's Cube": "divine structure, balance, protection, and universal geometry",
-    "Sri Yantra": "abundance, meditation, balance, and the union of inner and outer worlds",
-    "Merkaba": "light body, spiritual protection, ascension, and energetic harmony",
-    "Moon Phases": "cycles, intuition, feminine rhythm, reflection, and renewal",
-    "Golden Ratio": "natural proportion, beauty, order, and divine design",
-    "Chakana": "Andean cosmology, sacred balance, earth, sky, and spiritual alignment",
-}
 
-SUBJECTS = [
-    "Tree of Life", "Flower of Life", "Seed of Life", "Metatron's Cube", "Sri Yantra",
-    "Merkaba", "Moon Phases", "Golden Ratio Fern", "Sacred Whale", "Monstera Mandala",
-    "Tropical Sun", "Ancient Mountain", "Mystic Owl", "Ocean Spiral", "Lotus Geometry",
-    "Celestial Compass", "Sacred Mushroom", "Jungle Portal", "Root Network", "Solar Mandala"
+FALLBACK_SUBJECTS = [
+    "Tree of Life",
+    "Flower of Life",
+    "Seed of Life",
+    "Metatron's Cube",
+    "Sri Yantra",
+    "Merkaba",
+    "Moon Phases",
+    "Golden Ratio Fern",
+    "Sacred Whale",
+    "Lotus Geometry",
 ]
 
-STYLES = [
-    "vintage black ink sacred geometry",
-    "minimalist boho line art",
-    "aged parchment mystical illustration",
-    "luxury neutral gallery print",
-    "tropical botanical sacred geometry",
-    "ancient manuscript style",
-    "dark ink on warm handmade paper",
-    "soft earth-tone meditation art",
-    "high-contrast spiritual wall art",
-    "refined Japanese-inspired minimalism"
-]
 
-INTERIORS = [
-    "meditation room", "yoga studio", "boho bedroom", "minimalist living room",
-    "tropical home", "healing room", "modern office", "bookshelf vignette",
-    "gallery wall", "earthy wellness space"
-]
+def _fallback_products(count, collection, series, target_buyer, price, start_number, style_direction):
+    today = date.today().isoformat()
+    rows = []
 
-MOODS = ["calm", "grounded", "mystical", "elegant", "ancient", "peaceful", "earthy", "spiritual"]
+    for i in range(start_number, start_number + count):
+        subject = FALLBACK_SUBJECTS[(i - start_number) % len(FALLBACK_SUBJECTS)]
+        product_id = f"SLS-{i:03d}"
+        style = style_direction or "vintage black ink sacred geometry"
 
-PALETTES = [
-    "black ink on warm parchment",
-    "charcoal and ivory",
-    "soft beige, cream, and muted gold",
-    "deep forest green and warm ivory",
-    "burnt umber, sand, and black ink",
-    "sepia, antique white, and charcoal",
-    "earth brown, muted olive, and cream",
-    "minimal black and white"
-]
+        rows.append({
+            "Product ID": product_id,
+            "SKU": product_id + "-DIGITAL",
+            "Collection": collection,
+            "Series": series,
+            "Artwork Name": f"{subject} Study",
+            "Version": "v1",
+            "Status": "Fallback Generated",
+            "Launch Date": "",
+            "Last Updated": today,
+            "Theme": collection,
+            "Primary Subject": subject,
+            "Secondary Subject": "sacred geometry and nature symbolism",
+            "Sacred Symbol": subject,
+            "Symbol Meaning": "balance, harmony, intention, and connection with nature",
+            "Interior Style": "meditation room, yoga studio, boho bedroom",
+            "Art Style": style,
+            "Mood": "calm, spiritual, grounded",
+            "Color Palette": "black ink on warm parchment",
+            "Border Style": "clean elegant square border",
+            "Texture": "subtle aged paper texture",
+            "Lighting": "soft natural daylight",
+            "Composition": "centered, balanced, symmetrical",
+            "Complexity": "medium",
+            "Master Prompt": f"Create premium printable wall art featuring {subject} in {style}.",
+            "Image Prompt": f"Create a premium square printable wall art design featuring {subject} in {style}, clean border, high contrast, refined spiritual wall art, 300 DPI print quality.",
+            "Negative Prompt": "blurry, distorted, low resolution, messy geometry, cheap clip art, watermark, text errors",
+            "Variation Prompt": f"Create 4 elegant variations of {subject} in the same brand style.",
+            "Upscale Prompt": "Upscale for crisp 300 DPI print quality while preserving geometry and linework.",
+            "Editing Prompt": "Clean edges, improve contrast, correct geometry, remove artifacts.",
+            "Mockup Prompt": f"Show this square {subject} print framed in a warm meditation room with plants and natural light.",
+            "Hero Image Prompt": f"Create an Etsy thumbnail showing a framed square {subject} sacred geometry print.",
+            "Thumbnail Prompt": f"Create a clean premium Etsy thumbnail for {subject} printable wall art.",
+            "Print Sizes": "8x8, 10x10, 12x12, 16x16, 20x20, 24x24",
+            "DPI": "300",
+            "Aspect Ratio": "1:1",
+            "File Formats": "JPG, PNG, PDF",
+            "SEO Title": f"{subject} Printable Wall Art, Sacred Geometry Digital Download, Spiritual Decor",
+            "Short Title": f"{subject} Sacred Geometry Print",
+            "Meta Description": f"Printable {subject} wall art for meditation rooms, yoga studios, and peaceful spiritual spaces.",
+            "Full Description": f"Bring calm, beauty, and intention into your space with this {subject} printable wall art. This is a digital download. No physical item will be shipped.",
+            "13 Tags": "printable wall art,sacred geometry,spiritual decor,digital download,meditation decor,yoga room decor,boho wall art,mystic art,zen decor,square print,wall art print,energy art,download print",
+            "Category": "Art & Collectibles > Prints > Digital Prints",
+            "Materials": "digital download, printable wall art, JPG, PNG, PDF",
+            "Primary Keyword": f"{subject.lower()} printable wall art",
+            "Secondary Keywords": "sacred geometry, spiritual decor, meditation wall art, yoga studio print",
+            "Room Suggestions": "meditation room, yoga studio, bedroom, office",
+            "Price": price,
+            "Pinterest Title": f"{subject} Printable Wall Art",
+            "Pinterest Description": f"A peaceful {subject} printable for spiritual spaces and meditation rooms.",
+            "Instagram Caption": f"New {subject} printable wall art for peaceful spaces. #printablewallart #sacredgeometry",
+            "Facebook Caption": f"Bring calm and intention into your space with this {subject} printable wall art.",
+            "Email Announcement": f"Introducing {subject} Sacred Geometry Print.",
+            "Thank You Note": "Thank you so much for supporting Sacred Life Studio. I hope this piece brings beauty, calm, and intention into your space.",
+            "Printing Guide": "Print at home, through a local print shop, or with an online print service. Matte or fine art paper is recommended.",
+            "License": "Personal use only. Do not resell, redistribute, or use commercially without permission.",
+            "AI Disclosure": "This design was created with AI-assisted tools and refined with human creative direction.",
+            "Views": "",
+            "Favorites": "",
+            "Sales": "",
+            "Revenue": "",
+            "Conversion Rate": "",
+            "SEO Score": 80,
+            "Thumbnail Score": 80,
+            "Artwork Score": 80,
+            "Brand Score": 85,
+            "Originality Score": 78,
+            "Overall Score": 81,
+            "Notes": "Fallback template generated.",
+        })
 
-def clean_tag(tag: str) -> str:
-    return tag.lower().replace("'", "").strip()[:20]
+    return rows
 
-def make_tags(subject, collection, style):
-    raw = [
-        subject + " print",
-        "sacred geometry",
-        "spiritual wall art",
-        "printable wall art",
-        "digital download",
-        "meditation decor",
-        "yoga room decor",
-        "boho wall art",
-        "mystic art",
-        "zen wall decor",
-        "earthy decor",
-        "square print",
-        "wall art download",
-        collection,
-        style.split()[0] + " art",
-    ]
-    tags = []
-    for t in raw:
-        tag = clean_tag(t)
-        if tag and tag not in tags:
-            tags.append(tag)
-    return ", ".join(tags[:13])
 
-def score_product(subject, style, tags):
-    seo = min(100, 72 + len(tags.split(",")))
-    artwork = random.randint(78, 96)
-    brand = random.randint(82, 98)
-    originality = random.randint(74, 94)
-    thumbnail = random.randint(76, 95)
-    overall = round((seo + artwork + brand + originality + thumbnail) / 5)
-    return seo, thumbnail, artwork, brand, originality, overall
+def _parse_json(text):
+    try:
+        return json.loads(text)
+    except Exception:
+        start = text.find("[")
+        end = text.rfind("]") + 1
+        return json.loads(text[start:end])
+
 
 def generate_products(
     count=25,
@@ -97,144 +117,96 @@ def generate_products(
     target_buyer="meditation room, yoga studio, and spiritual home decor buyer",
     price=9.99,
     start_number=1,
-    style_direction=""
+    style_direction="",
 ):
-    rows = []
     today = date.today().isoformat()
 
-    for i in range(start_number, start_number + count):
-        subject = SUBJECTS[(i - start_number) % len(SUBJECTS)]
-        sacred_symbol = subject if subject in SYMBOL_MEANINGS else random.choice(list(SYMBOL_MEANINGS.keys()))
-        meaning = SYMBOL_MEANINGS.get(sacred_symbol, "balance, intention, and connection with nature")
-        art_style = style_direction.strip() or random.choice(STYLES)
-        interior = random.choice(INTERIORS)
-        mood = random.choice(MOODS)
-        palette = random.choice(PALETTES)
-        product_id = f"SLS-{i:03d}"
-        artwork_name = f"{subject} {random.choice(['Temple', 'Offering', 'Portal', 'Study', 'Prayer', 'Map', 'Bloom'])}"
-        primary_keyword = f"{subject.lower()} printable wall art"
-        secondary_keywords = f"sacred geometry, spiritual decor, meditation room decor, yoga studio wall art, boho printable"
-        tags = make_tags(subject, collection, art_style)
-        seo, thumb, artwork, brand, originality, overall = score_product(subject, art_style, tags)
+    try:
+        client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
-        image_prompt = (
-            f"Create a premium square printable wall art design featuring {subject}, "
-            f"integrated with {sacred_symbol} symbolism representing {meaning}. "
-            f"Use {art_style}, {palette}, a clean elegant border, balanced centered composition, "
-            f"subtle handmade texture, refined line work, high contrast, museum-quality print aesthetic, "
-            f"spiritual but not cheesy, timeless, upscale Etsy wall art, 300 DPI feel."
+        prompt = f"""
+Generate {count} unique Etsy digital-download printable wall art products for Sacred Life Studio.
+
+Brand:
+Premium sacred geometry, spiritual, botanical, mystical, and nature-inspired printable wall art.
+Elegant, timeless, clean, high-quality, not generic AI art.
+
+Collection: {collection}
+Series: {series}
+Target buyer: {target_buyer}
+Style direction: {style_direction or "choose the strongest Etsy-friendly style"}
+Price: {price}
+
+Return ONLY valid JSON as an array of objects.
+
+Each object must include:
+Artwork Name, Theme, Primary Subject, Secondary Subject, Sacred Symbol, Symbol Meaning,
+Interior Style, Art Style, Mood, Color Palette, Border Style, Texture, Lighting,
+Composition, Complexity, Master Prompt, Image Prompt, Negative Prompt, Variation Prompt,
+Upscale Prompt, Editing Prompt, Mockup Prompt, Hero Image Prompt, Thumbnail Prompt,
+SEO Title, Short Title, Meta Description, Full Description, 13 Tags, Category, Materials,
+Primary Keyword, Secondary Keywords, Room Suggestions, Pinterest Title, Pinterest Description,
+Instagram Caption, Facebook Caption, Email Announcement, Thank You Note, Printing Guide,
+License, AI Disclosure, SEO Score, Thumbnail Score, Artwork Score, Brand Score,
+Originality Score, Overall Score.
+
+Rules:
+- 13 Tags must be exactly 13 comma-separated Etsy tags.
+- SEO Title must be under 140 characters.
+- Full Description must say it is a digital download and no physical item will be shipped.
+- Scores must be numbers from 1 to 100.
+"""
+
+        response = client.chat.completions.create(
+            model="gpt-4.1-mini",
+            messages=[
+                {"role": "system", "content": "You return only valid JSON. No markdown."},
+                {"role": "user", "content": prompt},
+            ],
+            temperature=0.9,
         )
 
-        negative_prompt = (
-            "blurry, low resolution, distorted geometry, misspelled text, extra limbs, messy composition, "
-            "cheap clip art, oversaturated colors, fake watermark, cartoonish, noisy background, uneven border"
+        products = _parse_json(response.choices[0].message.content)
+
+        rows = []
+        for index, item in enumerate(products[:count], start=start_number):
+            product_id = f"SLS-{index:03d}"
+
+            row = {
+                "Product ID": product_id,
+                "SKU": product_id + "-DIGITAL",
+                "Collection": collection,
+                "Series": series,
+                "Version": "v1",
+                "Status": "AI Generated",
+                "Launch Date": "",
+                "Last Updated": today,
+                "Print Sizes": "8x8, 10x10, 12x12, 16x16, 20x20, 24x24",
+                "DPI": "300",
+                "Aspect Ratio": "1:1",
+                "File Formats": "JPG, PNG, PDF",
+                "Price": price,
+                "Views": "",
+                "Favorites": "",
+                "Sales": "",
+                "Revenue": "",
+                "Conversion Rate": "",
+                "Notes": "",
+            }
+
+            row.update(item)
+            rows.append(row)
+
+        return rows
+
+    except Exception as e:
+        st.warning(f"AI generation failed, using fallback templates. Error: {e}")
+        return _fallback_products(
+            count=count,
+            collection=collection,
+            series=series,
+            target_buyer=target_buyer,
+            price=price,
+            start_number=start_number,
+            style_direction=style_direction,
         )
-
-        mockup_prompt = (
-            f"Show this square {subject} printable artwork framed in a simple natural wood frame inside a {interior}, "
-            f"with soft natural daylight, plants, neutral decor, premium Etsy product photography, clean lifestyle mockup."
-        )
-
-        hero_prompt = (
-            f"Create an eye-catching Etsy thumbnail for a square framed {subject} sacred wall art print, "
-            f"warm natural lighting, clear artwork visibility, premium spiritual home decor, not cluttered."
-        )
-
-        title = (
-            f"{subject} Printable Wall Art, Sacred Geometry Digital Download, "
-            f"Spiritual {interior.title()} Decor, Boho Square Print"
-        )[:140]
-
-        short_title = f"{subject} Sacred Geometry Print"
-
-        meta = (
-            f"Printable {subject} wall art with sacred geometry styling, designed for meditation rooms, "
-            f"yoga studios, and peaceful spiritual spaces."
-        )
-
-        description = (
-            f"Bring calm, beauty, and intention into your space with this {subject} printable wall art. "
-            f"Designed in a {art_style} style with {palette}, this piece blends sacred symbolism with a refined, "
-            f"gallery-quality look that feels timeless and grounded.\n\n"
-            f"This digital download is ideal for a {interior}, meditation corner, yoga studio, office, bedroom, "
-            f"or healing space.\n\n"
-            f"WHAT YOU RECEIVE:\n"
-            f"- High-resolution printable files\n"
-            f"- Square format options: 8x8, 10x10, 12x12, 16x16, 20x20, 24x24\n"
-            f"- Easy print guide\n\n"
-            f"PLEASE NOTE:\n"
-            f"This is a digital download. No physical item will be shipped."
-        )
-
-        rows.append({
-            "Product ID": product_id,
-            "SKU": product_id + "-DIGITAL",
-            "Collection": collection,
-            "Series": series,
-            "Artwork Name": artwork_name,
-            "Version": "v1",
-            "Status": "Idea",
-            "Launch Date": "",
-            "Last Updated": today,
-            "Theme": collection,
-            "Primary Subject": subject,
-            "Secondary Subject": "sacred geometry and nature symbolism",
-            "Sacred Symbol": sacred_symbol,
-            "Symbol Meaning": meaning,
-            "Interior Style": interior,
-            "Art Style": art_style,
-            "Mood": mood,
-            "Color Palette": palette,
-            "Border Style": "clean elegant square border",
-            "Texture": "subtle aged paper / handmade print texture",
-            "Lighting": "soft natural daylight for mockups",
-            "Composition": "centered, symmetrical, balanced",
-            "Complexity": "medium",
-            "Master Prompt": image_prompt,
-            "Image Prompt": image_prompt,
-            "Negative Prompt": negative_prompt,
-            "Variation Prompt": f"Create 4 refined variations of {subject} using the same brand style but different border and texture details.",
-            "Upscale Prompt": "Upscale for crisp 300 DPI print quality, preserve clean geometry, sharpen linework, remove artifacts.",
-            "Editing Prompt": "Clean edges, correct geometry, improve contrast, remove visual noise, keep authentic handmade texture.",
-            "Mockup Prompt": mockup_prompt,
-            "Hero Image Prompt": hero_prompt,
-            "Thumbnail Prompt": hero_prompt,
-            "Print Sizes": "8x8, 10x10, 12x12, 16x16, 20x20, 24x24",
-            "DPI": "300",
-            "Aspect Ratio": "1:1",
-            "File Formats": "JPG, PNG, PDF",
-            "SEO Title": title,
-            "Short Title": short_title,
-            "Meta Description": meta,
-            "Full Description": description,
-            "13 Tags": tags,
-            "Category": "Art & Collectibles > Prints > Digital Prints",
-            "Materials": "digital download, printable wall art, JPG, PNG, PDF",
-            "Primary Keyword": primary_keyword,
-            "Secondary Keywords": secondary_keywords,
-            "Room Suggestions": f"{interior}, meditation room, yoga studio, bedroom, office",
-            "Price": price,
-            "Pinterest Title": f"{subject} Printable Wall Art for Peaceful Spiritual Spaces",
-            "Pinterest Description": meta,
-            "Instagram Caption": f"New {subject} print for peaceful spaces, meditation corners, and sacred homes. #printablewallart #sacredgeometry #spiritualdecor",
-            "Facebook Caption": f"Bring a little more calm and intention into your space with this {subject} printable wall art.",
-            "Email Announcement": f"Introducing {short_title}, a new digital print designed for calm, grounding, and intentional spaces.",
-            "Thank You Note": "Thank you so much for supporting Sacred Life Studio. I hope this piece brings beauty, calm, and intention into your space.",
-            "Printing Guide": "Print at home, through a local print shop, or with an online print service. Use matte or fine art paper for best results.",
-            "License": "Personal use only. Do not resell, redistribute, or use commercially without permission.",
-            "AI Disclosure": "This design was created with AI-assisted tools and refined with human creative direction.",
-            "Views": "",
-            "Favorites": "",
-            "Sales": "",
-            "Revenue": "",
-            "Conversion Rate": "",
-            "SEO Score": seo,
-            "Thumbnail Score": thumb,
-            "Artwork Score": artwork,
-            "Brand Score": brand,
-            "Originality Score": originality,
-            "Overall Score": overall,
-            "Notes": ""
-        })
-
-    return rows
