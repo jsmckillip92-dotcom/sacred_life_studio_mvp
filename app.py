@@ -235,22 +235,64 @@ elif page == "💡 Product Factory":
 
 
 # ---------- Product Manager ----------
+# ---------- Product Manager ----------
 elif page == "📁 Product Manager":
     st.header("📁 Product Manager")
 
     if df.empty:
         st.info("Generate products first in Product Factory.")
+
     else:
-        selected = st.selectbox("Select product", df["Product ID"].tolist())
+        selected = st.selectbox(
+            "Select Product",
+            df["Product ID"].tolist(),
+        )
+
         row = df[df["Product ID"] == selected].iloc[0]
 
-        st.subheader(row["Artwork Name"])
-        st.write(f"**Collection:** {row['Collection']}")
-        st.write(f"**Status:** {row['Status']}")
-        st.write(f"**Price:** ${row['Price']}")
-        st.write(f"**Overall Score:** {row['Overall Score']}")
+        st.subheader(f"📁 {row['Artwork Name']}")
 
+        left, right = st.columns([1, 2])
 
+        with left:
+            st.metric("Overall Score", row["Overall Score"])
+            st.metric("SEO Score", row["SEO Score"])
+            st.metric("Artwork Score", row["Artwork Score"])
+
+        with right:
+            st.write(f"**Collection:** {row['Collection']}")
+            st.write(f"**Series:** {row['Series']}")
+            st.write(f"**SKU:** {row['SKU']}")
+            st.write(f"**Price:** ${row['Price']}")
+            st.write(f"**Status:** {row['Status']}")
+
+        st.divider()
+
+        st.subheader("Quick Actions")
+
+        col1, col2, col3, col4 = st.columns(4)
+
+        with col1:
+            st.button("🎨 Artwork")
+
+        with col2:
+            st.button("✍️ Listing")
+
+        with col3:
+            st.button("🖼 Mockups")
+
+        with col4:
+            st.button("📦 Export")
+
+        st.divider()
+
+        st.subheader("Preview")
+
+        st.text_area(
+            "Image Prompt",
+            row["Image Prompt"],
+            height=220,
+        )
 # ---------- Artwork Studio ----------
 elif page == "🎨 Artwork Studio":
     st.header("🎨 Artwork Studio")
