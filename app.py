@@ -4,6 +4,9 @@ import pandas as pd
 from generator import generate_products
 from schema import COLUMNS
 from pages_custom.home import render_home
+from pages_custom.dashboard import render_dashboard
+from pages_custom.product_manager import render_product_manager
+
 
 st.set_page_config(
     page_title="Sacred Life Studio",
@@ -88,26 +91,7 @@ if page == "🏠 Home":
 
 # ---------- Dashboard ----------
 elif page == "📊 Dashboard":
-    st.header("📊 Dashboard")
-
-    total_products = len(df)
-    ai_generated = len(df[df["Status"] == "AI Generated"]) if not df.empty and "Status" in df else 0
-    fallback_generated = len(df[df["Status"] == "Fallback Generated"]) if not df.empty and "Status" in df else 0
-
-    col1, col2, col3, col4 = st.columns(4)
-    col1.metric("Products", total_products)
-    col2.metric("AI Generated", ai_generated)
-    col3.metric("Fallback", fallback_generated)
-    col4.metric("Avg Score", round(df["Overall Score"].mean(), 1) if not df.empty and "Overall Score" in df else 0)
-
-    st.divider()
-
-    if df.empty:
-        st.info("No products yet. Go to Product Factory to generate your first catalog.")
-    else:
-        st.subheader("Current Catalog")
-        st.dataframe(df, width="stretch", height=500)
-
+    render_dashboard(df)
 
 # ---------- Product Factory ----------
 elif page == "💡 Product Factory":
@@ -158,134 +142,8 @@ elif page == "💡 Product Factory":
 
 # ---------- Product Manager ----------
 elif page == "📁 Product Manager":
-    st.header("📁 Product Manager")
-
-    if df.empty:
-        st.info("Generate products first in Product Factory.")
-
-    else:
-        selected = st.selectbox(
-            "Select Product",
-            df["Product ID"].tolist(),
-        )
-
-        row = df[df["Product ID"] == selected].iloc[0]
-
-        st.subheader(f"📁 {row['Artwork Name']}")
-
-        tabs = st.tabs(
-            [
-                "📋 Overview",
-                "🎨 Artwork",
-                "✍️ Listing",
-                "🖼 Mockups",
-                "📈 SEO",
-                "📦 Export",
-            ]
-        )
-
-        with tabs[0]:
-            left, right = st.columns([1, 2])
-
-            with left:
-                st.metric("Overall Score", row["Overall Score"])
-                st.metric("SEO Score", row["SEO Score"])
-                st.metric("Artwork Score", row["Artwork Score"])
-
-            with right:
-                st.write(f"**Collection:** {row['Collection']}")
-                st.write(f"**Series:** {row['Series']}")
-                st.write(f"**SKU:** {row['SKU']}")
-                st.write(f"**Price:** ${row['Price']}")
-                st.write(f"**Status:** {row['Status']}")
-                st.write(f"**Version:** {row['Version']}")
-
-            st.divider()
-
-            st.subheader("Quick Actions")
-
-            col1, col2, col3, col4 = st.columns(4)
-            col1.button("🎨 Artwork")
-            col2.button("✍️ Listing")
-            col3.button("🖼 Mockups")
-            col4.button("📦 Export")
-
-        with tabs[1]:
-            st.subheader("🎨 Artwork")
-            st.markdown("### Image Prompt")
-            st.text_area("Image Prompt", row["Image Prompt"], height=220)
-
-            st.markdown("### Negative Prompt")
-            st.text_area("Negative Prompt", row["Negative Prompt"], height=120)
-
-            st.markdown("### Variation Prompt")
-            st.text_area("Variation Prompt", row["Variation Prompt"], height=120)
-
-            st.markdown("### Upscale Prompt")
-            st.text_area("Upscale Prompt", row["Upscale Prompt"], height=120)
-
-        with tabs[2]:
-            st.subheader("✍️ Listing")
-
-            st.markdown("### Etsy Title")
-            st.text_area("SEO Title", row["SEO Title"], height=80)
-
-            st.markdown("### Short Title")
-            st.text_input("Short Title", row["Short Title"])
-
-            st.markdown("### Description")
-            st.text_area("Full Description", row["Full Description"], height=250)
-
-            st.markdown("### 13 Etsy Tags")
-            st.text_area("13 Tags", row["13 Tags"], height=100)
-
-            st.markdown("### Materials")
-            st.text_input("Materials", row["Materials"])
-
-        with tabs[3]:
-            st.subheader("🖼 Mockups")
-
-            st.markdown("### Mockup Prompt")
-            st.text_area("Mockup Prompt", row["Mockup Prompt"], height=180)
-
-            st.markdown("### Hero Image Prompt")
-            st.text_area("Hero Image Prompt", row["Hero Image Prompt"], height=140)
-
-            st.markdown("### Thumbnail Prompt")
-            st.text_area("Thumbnail Prompt", row["Thumbnail Prompt"], height=140)
-
-        with tabs[4]:
-            st.subheader("📈 SEO Scorecard")
-
-            col1, col2, col3, col4 = st.columns(4)
-            col1.metric("SEO", row["SEO Score"])
-            col2.metric("Artwork", row["Artwork Score"])
-            col3.metric("Originality", row["Originality Score"])
-            col4.metric("Overall", row["Overall Score"])
-
-            st.divider()
-
-            st.write(f"**Primary Keyword:** {row['Primary Keyword']}")
-            st.write(f"**Secondary Keywords:** {row['Secondary Keywords']}")
-            st.write(f"**Meta Description:** {row['Meta Description']}")
-
-        with tabs[5]:
-            st.subheader("📦 Export Product")
-
-            product_export = pd.DataFrame([row])
-            csv = product_export.to_csv(index=False).encode("utf-8")
-
-            st.download_button(
-                label=f"Download {row['Product ID']} CSV",
-                data=csv,
-                file_name=f"{row['Product ID']}_listing.csv",
-                mime="text/csv",
-            )
-
-            st.markdown("### Product Notes")
-            st.write("Future versions will export product folders, prompt packs, listing packs, and image files.")
-
-
+    render_product_manager(df)
+    
 # ---------- Artwork Studio ----------
 elif page == "🎨 Artwork Studio":
     st.header("🎨 Artwork Studio")
