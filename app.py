@@ -13,6 +13,7 @@ st.set_page_config(
 
 st.title("🌿 Sacred Life Studio")
 st.caption("AI Digital Product Factory for Etsy printable wall art")
+
 st.markdown(
     """
     <style>
@@ -82,7 +83,6 @@ df = st.session_state.catalog
 
 
 # ---------- Home ----------
-# ---------- Home ----------
 if page == "🏠 Home":
     st.header("🏠 Sacred Life Studio HQ")
     st.write("Your AI-powered Etsy digital product factory.")
@@ -90,7 +90,7 @@ if page == "🏠 Home":
     col1, col2, col3 = st.columns(3)
     col1.metric("Products Created", len(df))
     col2.metric("Ready to Export", len(df) if not df.empty else 0)
-    col3.metric("Current Version", "v2.0")
+    col3.metric("Current Version", "v3.0")
 
     st.divider()
 
@@ -133,26 +133,13 @@ if page == "🏠 Home":
 
     st.info("Welcome back to Sacred Life Studio.")
 
-    st.subheader("🚀 Quick Actions")
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-        if st.button("💡 Go to Product Factory", use_container_width=True):
-            st.success("Select '💡 Product Factory' from the sidebar.")
-
-    with col2:
-        if st.button("📦 Go to Export Center", use_container_width=True):
-            st.success("Select '📦 Export Center' from the sidebar.")
-
-    st.divider()
-
     st.subheader("📋 Project Roadmap")
 
     roadmap = [
         ("✅", "Product generation"),
         ("✅", "CSV export"),
         ("✅", "Prompt generation"),
+        ("✅", "Product Manager workspace"),
         ("🟡", "AI generation waiting on API credits"),
         ("⬜", "Artwork generation"),
         ("⬜", "Mockup generation"),
@@ -235,7 +222,6 @@ elif page == "💡 Product Factory":
 
 
 # ---------- Product Manager ----------
-# ---------- Product Manager ----------
 elif page == "📁 Product Manager":
     st.header("📁 Product Manager")
 
@@ -252,47 +238,119 @@ elif page == "📁 Product Manager":
 
         st.subheader(f"📁 {row['Artwork Name']}")
 
-        left, right = st.columns([1, 2])
-
-        with left:
-            st.metric("Overall Score", row["Overall Score"])
-            st.metric("SEO Score", row["SEO Score"])
-            st.metric("Artwork Score", row["Artwork Score"])
-
-        with right:
-            st.write(f"**Collection:** {row['Collection']}")
-            st.write(f"**Series:** {row['Series']}")
-            st.write(f"**SKU:** {row['SKU']}")
-            st.write(f"**Price:** ${row['Price']}")
-            st.write(f"**Status:** {row['Status']}")
-
-        st.divider()
-
-        st.subheader("Quick Actions")
-
-        col1, col2, col3, col4 = st.columns(4)
-
-        with col1:
-            st.button("🎨 Artwork")
-
-        with col2:
-            st.button("✍️ Listing")
-
-        with col3:
-            st.button("🖼 Mockups")
-
-        with col4:
-            st.button("📦 Export")
-
-        st.divider()
-
-        st.subheader("Preview")
-
-        st.text_area(
-            "Image Prompt",
-            row["Image Prompt"],
-            height=220,
+        tabs = st.tabs(
+            [
+                "📋 Overview",
+                "🎨 Artwork",
+                "✍️ Listing",
+                "🖼 Mockups",
+                "📈 SEO",
+                "📦 Export",
+            ]
         )
+
+        with tabs[0]:
+            left, right = st.columns([1, 2])
+
+            with left:
+                st.metric("Overall Score", row["Overall Score"])
+                st.metric("SEO Score", row["SEO Score"])
+                st.metric("Artwork Score", row["Artwork Score"])
+
+            with right:
+                st.write(f"**Collection:** {row['Collection']}")
+                st.write(f"**Series:** {row['Series']}")
+                st.write(f"**SKU:** {row['SKU']}")
+                st.write(f"**Price:** ${row['Price']}")
+                st.write(f"**Status:** {row['Status']}")
+                st.write(f"**Version:** {row['Version']}")
+
+            st.divider()
+
+            st.subheader("Quick Actions")
+
+            col1, col2, col3, col4 = st.columns(4)
+            col1.button("🎨 Artwork")
+            col2.button("✍️ Listing")
+            col3.button("🖼 Mockups")
+            col4.button("📦 Export")
+
+        with tabs[1]:
+            st.subheader("🎨 Artwork")
+            st.markdown("### Image Prompt")
+            st.text_area("Image Prompt", row["Image Prompt"], height=220)
+
+            st.markdown("### Negative Prompt")
+            st.text_area("Negative Prompt", row["Negative Prompt"], height=120)
+
+            st.markdown("### Variation Prompt")
+            st.text_area("Variation Prompt", row["Variation Prompt"], height=120)
+
+            st.markdown("### Upscale Prompt")
+            st.text_area("Upscale Prompt", row["Upscale Prompt"], height=120)
+
+        with tabs[2]:
+            st.subheader("✍️ Listing")
+
+            st.markdown("### Etsy Title")
+            st.text_area("SEO Title", row["SEO Title"], height=80)
+
+            st.markdown("### Short Title")
+            st.text_input("Short Title", row["Short Title"])
+
+            st.markdown("### Description")
+            st.text_area("Full Description", row["Full Description"], height=250)
+
+            st.markdown("### 13 Etsy Tags")
+            st.text_area("13 Tags", row["13 Tags"], height=100)
+
+            st.markdown("### Materials")
+            st.text_input("Materials", row["Materials"])
+
+        with tabs[3]:
+            st.subheader("🖼 Mockups")
+
+            st.markdown("### Mockup Prompt")
+            st.text_area("Mockup Prompt", row["Mockup Prompt"], height=180)
+
+            st.markdown("### Hero Image Prompt")
+            st.text_area("Hero Image Prompt", row["Hero Image Prompt"], height=140)
+
+            st.markdown("### Thumbnail Prompt")
+            st.text_area("Thumbnail Prompt", row["Thumbnail Prompt"], height=140)
+
+        with tabs[4]:
+            st.subheader("📈 SEO Scorecard")
+
+            col1, col2, col3, col4 = st.columns(4)
+            col1.metric("SEO", row["SEO Score"])
+            col2.metric("Artwork", row["Artwork Score"])
+            col3.metric("Originality", row["Originality Score"])
+            col4.metric("Overall", row["Overall Score"])
+
+            st.divider()
+
+            st.write(f"**Primary Keyword:** {row['Primary Keyword']}")
+            st.write(f"**Secondary Keywords:** {row['Secondary Keywords']}")
+            st.write(f"**Meta Description:** {row['Meta Description']}")
+
+        with tabs[5]:
+            st.subheader("📦 Export Product")
+
+            product_export = pd.DataFrame([row])
+            csv = product_export.to_csv(index=False).encode("utf-8")
+
+            st.download_button(
+                label=f"Download {row['Product ID']} CSV",
+                data=csv,
+                file_name=f"{row['Product ID']}_listing.csv",
+                mime="text/csv",
+            )
+
+            st.markdown("### Product Notes")
+            st.write("Future versions will export product folders, prompt packs, listing packs, and image files.")
+
+
 # ---------- Artwork Studio ----------
 elif page == "🎨 Artwork Studio":
     st.header("🎨 Artwork Studio")
@@ -422,4 +480,4 @@ elif page == "⚙️ Settings":
     st.write("If AI generation fails with insufficient_quota, add billing/credits to your OpenAI API account.")
 
     st.subheader("App Info")
-    st.write("Sacred Life Studio MVP v2.0")
+    st.write("Sacred Life Studio MVP v3.0")
