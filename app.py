@@ -20,11 +20,13 @@ st.sidebar.title("Sacred Life Studio")
 page = st.sidebar.radio(
     "Navigation",
     [
+        "🏠 Home",
         "📊 Dashboard",
         "💡 Product Factory",
-        "🎨 Artwork Factory",
-        "🖼 Mockup Factory",
-        "✍️ Listing Factory",
+        "📁 Product Manager",
+        "🎨 Artwork Studio",
+        "🖼 Mockup Studio",
+        "✍️ Listing Studio",
         "📦 Export Center",
         "📈 Analytics",
         "⚙️ Settings",
@@ -39,8 +41,60 @@ if "catalog" not in st.session_state:
 df = st.session_state.catalog
 
 
+# ---------- Home ----------
+if page == "🏠 Home":
+    st.header("🏠 Sacred Life Studio HQ")
+    st.write("Your AI-powered Etsy digital product factory.")
+
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Products Created", len(df))
+    col2.metric("Ready to Export", len(df) if not df.empty else 0)
+    col3.metric("Current Version", "v2.0")
+
+    st.divider()
+
+    st.subheader("Production Pipeline")
+    st.write("1. Generate product concepts")
+    st.write("2. Create artwork prompts")
+    st.write("3. Build mockup prompts")
+    st.write("4. Write Etsy listings")
+    st.write("5. Export CSV and product files")
+
+    st.info("Welcome back to Sacred Life Studio.")
+
+    st.subheader("🚀 Quick Actions")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        if st.button("💡 Go to Product Factory", use_container_width=True):
+            st.success("Select '💡 Product Factory' from the sidebar.")
+
+    with col2:
+        if st.button("📦 Go to Export Center", use_container_width=True):
+            st.success("Select '📦 Export Center' from the sidebar.")
+
+    st.divider()
+
+    st.subheader("📋 Project Roadmap")
+
+    roadmap = [
+        ("✅", "Product generation"),
+        ("✅", "CSV export"),
+        ("✅", "Prompt generation"),
+        ("🟡", "AI generation waiting on API credits"),
+        ("⬜", "Artwork generation"),
+        ("⬜", "Mockup generation"),
+        ("⬜", "Etsy draft publishing"),
+        ("⬜", "Trend research"),
+    ]
+
+    for status, item in roadmap:
+        st.write(f"{status} {item}")
+
+
 # ---------- Dashboard ----------
-if page == "📊 Dashboard":
+elif page == "📊 Dashboard":
     st.header("📊 Dashboard")
 
     total_products = len(df)
@@ -109,9 +163,26 @@ elif page == "💡 Product Factory":
         st.dataframe(df, width="stretch", height=500)
 
 
-# ---------- Artwork Factory ----------
-elif page == "🎨 Artwork Factory":
-    st.header("🎨 Artwork Factory")
+# ---------- Product Manager ----------
+elif page == "📁 Product Manager":
+    st.header("📁 Product Manager")
+
+    if df.empty:
+        st.info("Generate products first in Product Factory.")
+    else:
+        selected = st.selectbox("Select product", df["Product ID"].tolist())
+        row = df[df["Product ID"] == selected].iloc[0]
+
+        st.subheader(row["Artwork Name"])
+        st.write(f"**Collection:** {row['Collection']}")
+        st.write(f"**Status:** {row['Status']}")
+        st.write(f"**Price:** ${row['Price']}")
+        st.write(f"**Overall Score:** {row['Overall Score']}")
+
+
+# ---------- Artwork Studio ----------
+elif page == "🎨 Artwork Studio":
+    st.header("🎨 Artwork Studio")
 
     if df.empty:
         st.info("Generate products first in Product Factory.")
@@ -133,9 +204,9 @@ elif page == "🎨 Artwork Factory":
         st.code(row["Upscale Prompt"])
 
 
-# ---------- Mockup Factory ----------
-elif page == "🖼 Mockup Factory":
-    st.header("🖼 Mockup Factory")
+# ---------- Mockup Studio ----------
+elif page == "🖼 Mockup Studio":
+    st.header("🖼 Mockup Studio")
 
     if df.empty:
         st.info("Generate products first in Product Factory.")
@@ -153,9 +224,9 @@ elif page == "🖼 Mockup Factory":
         st.code(row["Thumbnail Prompt"])
 
 
-# ---------- Listing Factory ----------
-elif page == "✍️ Listing Factory":
-    st.header("✍️ Listing Factory")
+# ---------- Listing Studio ----------
+elif page == "✍️ Listing Studio":
+    st.header("✍️ Listing Studio")
 
     if df.empty:
         st.info("Generate products first in Product Factory.")
@@ -235,7 +306,7 @@ elif page == "⚙️ Settings":
         st.error("OPENAI_API_KEY is missing from Streamlit Secrets.")
 
     st.subheader("Current Status")
-    st.write("If AI generation fails with `insufficient_quota`, add billing/credits to your OpenAI API account.")
+    st.write("If AI generation fails with insufficient_quota, add billing/credits to your OpenAI API account.")
 
     st.subheader("App Info")
-    st.write("Sacred Life Studio MVP v1.1")
+    st.write("Sacred Life Studio MVP v2.0")
