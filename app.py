@@ -8,6 +8,7 @@ from pages_custom.dashboard import render_dashboard
 from pages_custom.product_manager import render_product_manager
 from pages_custom.product_factory import render_product_factory
 from pages_custom.artwork import render_artwork
+from pages_custom.mockups import render_mockups
 
 st.set_page_config(
     page_title="Sacred Life Studio",
@@ -101,32 +102,18 @@ elif page == "💡 Product Factory":
 elif page == "📁 Product Manager":
     render_product_manager(df)
 
-# ---------- Artwork Studio ----------
+
 # ---------- Artwork Studio ----------
 elif page == "🎨 Artwork Studio":
     render_artwork(df)
-    
+
+
+
 
 # ---------- Mockup Studio ----------
 elif page == "🖼 Mockup Studio":
-    st.header("🖼 Mockup Studio")
-
-    if df.empty:
-        st.info("Generate products first in Product Factory.")
-    else:
-        selected = st.selectbox("Select product", df["Product ID"].tolist())
-        row = df[df["Product ID"] == selected].iloc[0]
-
-        st.markdown("### Mockup Prompt")
-        st.code(row["Mockup Prompt"])
-
-        st.markdown("### Hero Image Prompt")
-        st.code(row["Hero Image Prompt"])
-
-        st.markdown("### Thumbnail Prompt")
-        st.code(row["Thumbnail Prompt"])
-
-
+    render_mockups(df)
+    
 # ---------- Listing Studio ----------
 elif page == "✍️ Listing Studio":
     st.header("✍️ Listing Studio")

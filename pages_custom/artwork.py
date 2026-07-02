@@ -56,17 +56,40 @@ def render_artwork(df):
         st.container(height=350)
 
     with tabs[2]:
-        st.success("Future AI Generation Center")
 
-        st.button("🎨 Generate Artwork", use_container_width=True)
-        st.button("🔄 Regenerate", use_container_width=True)
-        st.button("⭐ Save Favorite", use_container_width=True)
+    st.subheader("AI Artwork Generator")
 
-        st.divider()
+    model = st.selectbox(
+        "Model",
+        [
+            "GPT Image 1",
+            "DALL·E 3",
+        ],
+    )
 
-        st.write("Future Features")
-        st.write("• OpenAI Images")
-        st.write("• GPT Image 1")
-        st.write("• Flux")
-        st.write("• Midjourney")
-        st.write("• Stable Diffusion")
+    size = st.selectbox(
+        "Image Size",
+        [
+            "1024x1024",
+            "1024x1536",
+            "1536x1024",
+        ],
+    )
+
+    num_images = st.selectbox(
+        "Number of Images",
+        [1, 2, 4],
+    )
+
+    st.divider()
+
+    if st.button("🎨 Generate Artwork", type="primary"):
+        st.warning(
+            "OpenAI billing is not enabled yet.\n\n"
+            "Once API credits are added, this button will generate artwork directly inside Sacred Life Studio."
+        )
+
+    st.divider()
+
+    st.subheader("Generated Images")
+    st.info("No artwork generated yet.")
