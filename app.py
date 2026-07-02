@@ -13,6 +13,46 @@ st.set_page_config(
 
 st.title("🌿 Sacred Life Studio")
 st.caption("AI Digital Product Factory for Etsy printable wall art")
+st.markdown(
+    """
+    <style>
+    .block-container {
+        padding-top: 2rem;
+    }
+
+    div[data-testid="stMetric"] {
+        background: linear-gradient(135deg, #1b2a1f, #243b2a);
+        border: 1px solid #355e3b;
+        padding: 18px;
+        border-radius: 18px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+    }
+
+    div[data-testid="stMetricLabel"] {
+        color: #b7d7b2;
+    }
+
+    div[data-testid="stMetricValue"] {
+        color: #ffffff;
+        font-size: 2.2rem;
+    }
+
+    .sls-card {
+        background: #111827;
+        border: 1px solid #2f3b4a;
+        border-radius: 18px;
+        padding: 22px;
+        margin-bottom: 18px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.22);
+    }
+
+    .sls-card h3 {
+        margin-top: 0;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
 
 # ---------- Sidebar ----------
@@ -42,6 +82,7 @@ df = st.session_state.catalog
 
 
 # ---------- Home ----------
+# ---------- Home ----------
 if page == "🏠 Home":
     st.header("🏠 Sacred Life Studio HQ")
     st.write("Your AI-powered Etsy digital product factory.")
@@ -54,11 +95,41 @@ if page == "🏠 Home":
     st.divider()
 
     st.subheader("Production Pipeline")
-    st.write("1. Generate product concepts")
-    st.write("2. Create artwork prompts")
-    st.write("3. Build mockup prompts")
-    st.write("4. Write Etsy listings")
-    st.write("5. Export CSV and product files")
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.markdown(
+            """
+            <div class="sls-card">
+            <h3>💡 Product Factory</h3>
+            <p>Create Etsy-ready product concepts, titles, tags, pricing, and prompts.</p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    with col2:
+        st.markdown(
+            """
+            <div class="sls-card">
+            <h3>🎨 Artwork Studio</h3>
+            <p>Build image prompts, negative prompts, variation prompts, and upscale prompts.</p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    with col3:
+        st.markdown(
+            """
+            <div class="sls-card">
+            <h3>📦 Export Center</h3>
+            <p>Download CSV files and prepare complete Etsy listing packages.</p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
     st.info("Welcome back to Sacred Life Studio.")
 
