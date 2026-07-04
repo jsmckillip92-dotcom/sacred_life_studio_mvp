@@ -9,12 +9,16 @@ from pages_custom.product_manager import render_product_manager
 from pages_custom.product_factory import render_product_factory
 from pages_custom.artwork import render_artwork
 from pages_custom.mockups import render_mockups
+from pages_custom.opportunity_engine import render_opportunity_engine
+from database import init_db
 
 st.set_page_config(
     page_title="Sacred Life Studio",
     page_icon="🌿",
     layout="wide",
 )
+
+init_db()
 
 st.title("🌿 Sacred Life Studio")
 st.caption("AI Digital Product Factory for Etsy printable wall art")
@@ -76,6 +80,7 @@ page = st.sidebar.radio(
         "📦 Export Center",
         "📈 Analytics",
         "⚙️ Settings",
+        "🚀 Opportunity Engine",
     ],
 )
 
@@ -83,6 +88,8 @@ page = st.sidebar.radio(
 # ---------- Session State ----------
 if "catalog" not in st.session_state:
     st.session_state.catalog = pd.DataFrame(columns=COLUMNS)
+if "projects" not in st.session_state:
+    st.session_state.projects = []
 
 df = st.session_state.catalog
 
@@ -90,6 +97,11 @@ df = st.session_state.catalog
 # ---------- Home ----------
 if page == "🏠 Home":
     render_home(df)
+
+
+# ---------- Opportunity Engine ----------
+elif page == "🚀 Opportunity Engine":
+    render_opportunity_engine()
 
 # ---------- Dashboard ----------
 elif page == "📊 Dashboard":

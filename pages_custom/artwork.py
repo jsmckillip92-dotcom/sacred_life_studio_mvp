@@ -56,24 +56,16 @@ def render_artwork(df):
         st.container(height=350)
 
     with tabs[2]:
-
-    st.subheader("AI Artwork Generator")
+        st.subheader("AI Artwork Generator")
 
     model = st.selectbox(
         "Model",
-        [
-            "GPT Image 1",
-            "DALL·E 3",
-        ],
+        ["GPT Image 1", "DALL·E 3"],
     )
 
     size = st.selectbox(
         "Image Size",
-        [
-            "1024x1024",
-            "1024x1536",
-            "1536x1024",
-        ],
+        ["1024x1024", "1024x1536", "1536x1024"],
     )
 
     num_images = st.selectbox(
@@ -83,10 +75,9 @@ def render_artwork(df):
 
     st.divider()
 
-    if st.button("🎨 Generate Artwork", type="primary"):
+    if st.button("🎨 Generate Artwork", type="primary", use_container_width=True):
         st.warning(
-            "OpenAI billing is not enabled yet.\n\n"
-            "Once API credits are added, this button will generate artwork directly inside Sacred Life Studio."
+            "OpenAI billing is not enabled yet. Once API credits are added, this button will generate artwork directly inside Sacred Life Studio."
         )
 
     st.divider()
